@@ -27,9 +27,15 @@ app.include_router(ai.router)
 
 # AI router is not included in Phase 1
 
-@app.get("/")
+from fastapi.responses import RedirectResponse
+
+@app.get("/", include_in_schema=False)
 def read_root():
-    return {"message": "Welcome to NEUROVIA Cognitive Care Platform API"}
+    return RedirectResponse(url="/web/")
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "service": "NEUROVIA Cognitive Care Platform API"}
 
 @app.get("/dashboard/summary/{user_id}")
 def dashboard_summary(user_id: int, db: database.SessionLocal = Depends(database.get_db)):
@@ -56,8 +62,13 @@ def dashboard_patient_analytics(user_id: int, db: database.SessionLocal = Depend
     from .services import dashboard_service
     return dashboard_service.get_comprehensive_patient_analytics(user_id, db)
 
-# Mount static web frontend files
-web_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web")
+# Mount static web frontend files and assets
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+web_dir = os.path.join(base_dir, "web")
 if os.path.exists(web_dir):
     app.mount("/web", StaticFiles(directory=web_dir, html=True), name="web")
     app.mount("/app", StaticFiles(directory=web_dir, html=True), name="app")
+
+assets_dir = os.path.join(base_dir, "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")

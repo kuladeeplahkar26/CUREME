@@ -3,7 +3,7 @@
    Connects to FastAPI backend at http://127.0.0.1:8000 with local fallback
    ========================================================================== */
 
-const API_BASE = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.includes(':8000'))
+const API_BASE = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.protocol.startsWith('http'))
   ? window.location.origin
   : 'http://127.0.0.1:8000';
 
