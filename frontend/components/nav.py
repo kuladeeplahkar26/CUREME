@@ -58,7 +58,7 @@ def render_nav():
             <div style="display: flex; align-items: center;">
                 <div class="apon-brand">
                     <span class="material-symbols-outlined apon-brand-icon">spa</span>
-                    <span>APON</span>
+                    <span>NEUROVIA</span>
                 </div>
                 <span class="apon-badge-wellness">Cognitive Wellness Platform</span>
             </div>
@@ -132,7 +132,7 @@ def render_nav():
     st.sidebar.markdown("""
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
             <span class="material-symbols-outlined" style="color: #1FA77A; font-size: 26px;">spa</span>
-            <h3 style="margin: 0; color: #1D2B3A; font-weight: 700;">APON</h3>
+            <h3 style="margin: 0; color: #1D2B3A; font-weight: 700;">NEUROVIA</h3>
         </div>
     """, unsafe_allow_html=True)
 

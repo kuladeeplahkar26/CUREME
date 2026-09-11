@@ -1,5 +1,5 @@
 /* ==========================================================================
-   APON / NEUROVIA - Web Application Logic with Full Live Backend Integration
+   NEUROVIA - Web Application Logic with Full Live Backend Integration
    ========================================================================== */
 
 async function startApp() {
@@ -600,7 +600,7 @@ async function startApp() {
     const ptName = currentSession ? currentSession.name : 'Patient';
     const caregiverName = currentSession && currentSession.role === 'caregiver' ? currentSession.name : 'Authorized Caregiver';
     const reportContent = `=====================================================
-CLINICAL COGNITIVE CARE REPORT - APON / NEUROVIA
+CLINICAL COGNITIVE CARE REPORT - NEUROVIA
 Participant: ${ptName}
 Primary Caregiver: ${caregiverName}
 Physician: Geriatric Neurology Clinic

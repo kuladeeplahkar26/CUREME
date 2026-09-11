@@ -12,7 +12,7 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="Pattern Recall - APON", layout="wide")
+st.set_page_config(page_title="Pattern Recall - NEUROVIA", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()

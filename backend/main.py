@@ -8,7 +8,7 @@ from .routers import ai, auth, games, memories, reminders, users
 
 database.init_db()
 
-app = FastAPI(title="Cognitive Care Platform API")
+app = FastAPI(title="NEUROVIA Cognitive Care Platform API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,7 +29,7 @@ app.include_router(ai.router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Cognitive Care Platform API"}
+    return {"message": "Welcome to NEUROVIA Cognitive Care Platform API"}
 
 @app.get("/dashboard/summary/{user_id}")
 def dashboard_summary(user_id: int, db: database.SessionLocal = Depends(database.get_db)):

@@ -12,7 +12,7 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="Memory Assistant - APON", layout="wide")
+st.set_page_config(page_title="Memory Assistant - NEUROVIA", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()
@@ -56,7 +56,7 @@ with tab1:
         else:
             st.markdown(f"""
                 <div style="background-color: #F5F7F8; color: #17212B; padding: 12px 18px; border-radius: 16px 16px 16px 4px; margin-bottom: 12px; max-width: 70%; float: left; clear: both; font-size: 1.05rem; line-height: 1.5; border: 1px solid #E5E9EC;">
-                    <div style="font-size: 0.8rem; font-weight: 600; color: #1FA77A; margin-bottom: 2px;">APON Assistant</div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: #1FA77A; margin-bottom: 2px;">NEUROVIA Assistant</div>
                     {msg['content']}
                 </div>
             """, unsafe_allow_html=True)

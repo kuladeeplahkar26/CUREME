@@ -11,7 +11,7 @@ from components.nav import render_nav
 from utils import styles
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="Settings - APON", layout="wide")
+st.set_page_config(page_title="Settings - NEUROVIA", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()
@@ -92,13 +92,13 @@ with col_side:
             </div>
             <div style="border-top: 1px solid #E5E9EC; padding-top: 16px;">
                 <p style="color: #6B7680; font-size: 0.85rem; margin: 0;">
-                    APON stores your cognitive exercise results locally and securely. No personal medical information is shared externally.
+                    NEUROVIA stores your cognitive exercise results locally and securely. No personal medical information is shared externally.
                 </p>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Sign Out of APON", key="btn_settings_signout", use_container_width=True):
+    if st.button("Sign Out of NEUROVIA", key="btn_settings_signout", use_container_width=True):
         st.session_state.clear()
         st.switch_page("pages/login.py")
 

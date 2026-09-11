@@ -9,7 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils import styles
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="APON - Cognitive Wellness Platform", layout="wide")
+st.set_page_config(page_title="NEUROVIA - Cognitive Wellness Platform", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 

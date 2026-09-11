@@ -14,7 +14,7 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import get_recent_sessions, get_summary_stats, initialize_session_state
 
-st.set_page_config(page_title="Your Progress - APON", layout="wide")
+st.set_page_config(page_title="Your Progress - NEUROVIA", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()
