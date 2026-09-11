@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APON / NEUROVIA - Cognitive Wellness Platform</title>
+  <meta name="description" content="A restorative, dignified, and ultra-legible digital sanctuary for cognitive care and caregiver oversight.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-locked">
+
+  <!-- Fixed 280px Left Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <div class="brand-icon-box">
+          <span class="material-symbols-outlined">spa</span>
+        </div>
+        <div>
+          <div class="brand-title">NEUROVIA</div>
+          <span class="brand-subtitle">Cognitive Wellness</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="mainNav">
+        <button class="nav-item" data-target="elderly-view" id="nav-home">
+          <span class="material-symbols-outlined">home</span>
+          <span>Home (Participant)</span>
+        </button>
+        <button class="nav-item" data-target="caregiver-view" id="nav-caregiver">
+          <span class="material-symbols-outlined">supervisor_account</span>
+          <span>Caregiver Overview</span>
+        </button>
+        <button class="nav-item" data-target="games-view" id="nav-games">
+          <span class="material-symbols-outlined">extension</span>
+          <span>Cognitive Games</span>
+        </button>
+        <button class="nav-item" data-target="progress-view" id="nav-progress">
+          <span class="material-symbols-outlined">trending_up</span>
+          <span>My Progress</span>
+        </button>
+        <button class="nav-item" data-target="memory-view" id="nav-memory">
+          <span class="material-symbols-outlined">psychology</span>
+          <span>Memory Assistant</span>
+        </button>
+        <button class="nav-item" data-target="routine-view" id="nav-routine">
+          <span class="material-symbols-outlined">calendar_today</span>
+          <span>Daily Routine</span>
+        </button>
+        <button class="nav-item" data-target="settings-view" id="nav-settings">
+          <span class="material-symbols-outlined">accessibility_new</span>
+          <span>Settings</span>
+        </button>
+        <button class="nav-item active" data-target="login-view" id="nav-login">
+          <span class="material-symbols-outlined">login</span>
+          <span id="navLoginText">Sign In / Role</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile-badge" id="profileBadge">
+        <img class="profile-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23176B4D'/><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' fill='%23FFFFFF' font-family='sans-serif' font-weight='700' font-size='38'>NV</text></svg>" alt="User Profile" id="profileImg">
+        <div style="flex: 1; min-width: 0;">
+          <div class="profile-name" id="profileName">Guest User</div>
+          <div class="profile-role" id="profileRoleLabel">
+            <span class="role-dot"></span>
+            <span id="roleText">Not Signed In</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn-switch-view" id="btnSwitchPerspective" type="button">
+        <span class="material-symbols-outlined">swap_horiz</span>
+        <span id="switchBtnText">Switch to Participant</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Shell -->
+  <div class="main-wrapper">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-status">
+        <span class="material-symbols-outlined" style="color: var(--primary);">schedule</span>
+        <span id="liveClockText">Today, 10:30 AM • Calm Morning Routine</span>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-voice" id="btnHeaderAuth" type="button" aria-label="Sign In / Account" onclick="switchTab('login-view')">
+          <span class="material-symbols-outlined" style="color: var(--primary);">account_circle</span>
+          <span id="headerAuthText">Sign In</span>
+        </button>
+        <button class="btn-voice" id="btnVoiceAssistant" type="button" aria-label="Voice Assistant">
+          <span class="material-symbols-outlined" style="color: var(--primary);">mic</span>
+          <span>Voice Assistant</span>
+        </button>
+        <button class="btn-emergency" id="btnEmergencyHelp" type="button" aria-label="Emergency Help">
+          <span class="material-symbols-outlined">emergency</span>
+          <span>Emergency Help</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Content Workspace -->
+    <main class="content-area">
+
+      <!-- ============================================================== -->
+      <!-- VIEW 0: DUAL-ROLE LOGIN & AUTHENTICATION (User Requirement #1) -->
+      <!-- ============================================================== -->
+      <section class="view-section active" id="view-login-view">
+        <div class="auth-page-container">
+          <div class="auth-header-card">
+            <div class="auth-brand-badge">
+              <span class="material-symbols-outlined" style="font-size: 20px;">spa</span>
+              <span>NEUROVIA HEALTHCARE PORTAL</span>
+            </div>
+            <h1 class="auth-title">Welcome to Cognitive Wellness</h1>
+            <p class="auth-subtitle">Choose your login option below to access personalized routines, cognitive exercises, or caregiver oversight.</p>
+          </div>
+
+          <!-- Role Selection Cards: 1. Elderly Patient Login, 2. Caregiver Login -->
+          <div class="role-selection-grid">
+            <div class="role-card active" id="roleCardElderly" onclick="selectLoginRole('elderly')" role="button" tabindex="0" aria-label="1. Elderly Patient Login">
+              <div class="role-icon-box elderly">
+                <span class="material-symbols-outlined">elderly</span>
+              </div>
+              <div class="role-card-name">1. Elderly Patient Login</div>
+              <div class="role-card-desc">Personal daily routines, gentle memory games, voice assistant, and memory albums.</div>
+            </div>
+
+            <div class="role-card" id="roleCardCaregiver" onclick="selectLoginRole('caregiver')" role="button" tabindex="0" aria-label="2. Caregiver Login">
+              <div class="role-icon-box caregiver">
+                <span class="material-symbols-outlined">supervisor_account</span>
+              </div>
+              <div class="role-card-name">2. Caregiver Login</div>
+              <div class="role-card-desc">Patient management, clinical reports, medication adherence tracking, and reassurance notes.</div>
+            </div>
+          </div>
+
+          <!-- Auth Form Card -->
+          <div class="auth-card">
+            <div id="authAlertBox" style="display: none;" class="auth-alert-box"></div>
+
+            <!-- Mode Switcher: Sign In vs Create Account -->
+            <div class="auth-tab-bar" role="tablist" aria-label="Authentication Mode">
+              <button type="button" id="tabSignIn" class="auth-mode-tab active" onclick="setAuthMode('login')" role="tab" aria-selected="true">
+                <span class="material-symbols-outlined" style="font-size: 20px;">login</span>
+                <span>Sign In</span>
+              </button>
+              <button type="button" id="tabRegister" class="auth-mode-tab" onclick="setAuthMode('register')" role="tab" aria-selected="false">
+                <span class="material-symbols-outlined" style="font-size: 20px;">person_add</span>
+                <span>Create New Account</span>
+              </button>
+            </div>
+
+            <form id="authLoginForm" onsubmit="handleAuthSubmit(event)">
+              <div class="form-group">
+                <label class="form-label" for="loginUsername">Username *</label>
+                <input type="text" id="loginUsername" class="form-input" placeholder="Enter username" required autocomplete="username">
+              </div>
+
+              <div class="form-group" id="groupFullName" style="display: none;">
+                <label class="form-label" for="loginFullName">Full Name *</label>
+                <input type="text" id="loginFullName" class="form-input" placeholder="e.g. John Doe">
+              </div>
+
+              <div class="form-group" id="groupAge" style="display: none;">
+                <label class="form-label" for="loginAge">Age (Years)</label>
+                <input type="number" id="loginAge" class="form-input" placeholder="e.g. 72" min="1" max="120">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="loginPassword">Password *</label>
+                <input type="password" id="loginPassword" class="form-input" placeholder="Enter password" required autocomplete="current-password">
+              </div>
+
+              <button type="submit" class="auth-btn-submit" id="btnSubmitAuth">
+                <span class="material-symbols-outlined" id="authBtnSubmitIcon">login</span>
+                <span id="authBtnSubmitText">Sign In as Elderly Patient</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 1: CAREGIVER OVERVIEW (Default) -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-caregiver-view">
+        <!-- Context & Action Bar -->
+        <div class="context-bar">
+          <div>
+            <div class="portal-tag">
+              <span>Caregiver Oversight Portal</span>
+              <span class="pulse-dot"></span>
+              <span style="color: var(--primary);">Live Syncing</span>
+            </div>
+
+            <!-- Participant Pill -->
+            <div class="participant-selector" id="caregiverActivePatientSelector">
+              <img class="participant-img" id="caregiverActivePatientAvatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23176B4D'/><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' fill='%23FFFFFF' font-family='sans-serif' font-weight='700' font-size='38'>PT</text></svg>" alt="Active Participant">
+              <div>
+                <div class="participant-name" id="caregiverActivePatientName">Loading Patient...</div>
+                <div class="participant-status" id="caregiverActivePatientStatus">
+                  <span class="pulse-dot"></span>
+                  <span>Active Monitored</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <button class="btn-primary" id="btnOpenAddPatient" onclick="openAddPatientModal()" type="button">
+              <span class="material-symbols-outlined">person_add</span>
+              <span>Add Patient</span>
+            </button>
+            <button class="btn-secondary" id="btnAuditLog" type="button">
+              <span class="material-symbols-outlined" style="color: var(--secondary);">history_edu</span>
+              <span>View Audit Log</span>
+            </button>
+            <button class="btn-primary" id="btnShareClinician" type="button">
+              <span class="material-symbols-outlined">ios_share</span>
+              <span>Share with Clinician</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- CAREGIVER PATIENT MANAGEMENT (User Requirement #2)            -->
+        <!-- ============================================================== -->
+        <section class="card patient-management-card" id="caregiverPatientManagementSection">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 style="display: flex; align-items: center; gap: 8px;">
+                  <span class="material-symbols-outlined" style="color: var(--primary);">groups</span>
+                  <span>Patient Management</span>
+                </h2>
+                <span class="badge-done" id="caregiverPatientCountBadge">1 Patient</span>
+              </div>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                Manage participant profiles under your care. Select a patient to view their cognitive progress or add a new patient.
+              </p>
+            </div>
+            <button class="btn-primary" onclick="openAddPatientModal()" type="button">
+              <span class="material-symbols-outlined">add</span>
+              <span>Add Patient</span>
+            </button>
+          </div>
+
+          <!-- Patient Cards Grid -->
+          <div class="patient-card-grid" id="caregiverPatientsGrid">
+            <!-- Dynamically rendered by app.js -->
+          </div>
+
+          <!-- Empty State (Shown when Caregiver has 0 patients) -->
+          <div class="patient-empty-state" id="caregiverNoPatients" style="display: none;">
+            <div class="empty-state-icon">
+              <span class="material-symbols-outlined" style="font-size: 40px; color: var(--secondary);">group_off</span>
+            </div>
+            <h3 style="font-size: 18px; margin-bottom: 6px;">No Patients Currently Assigned</h3>
+            <p style="color: var(--text-muted); font-size: 14px; max-width: 440px; margin: 0 auto 16px;">
+              You do not have any elderly participants registered under your care. Click below to add your first patient profile.
+            </p>
+            <button class="btn-primary" onclick="openAddPatientModal()" type="button" style="margin: 0 auto;">
+              <span class="material-symbols-outlined">person_add</span>
+              <span>Add Your First Patient</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- 4-Metric KPI Grid -->
+        <div class="metrics-grid">
+          <!-- Metric 1: Activities Completed -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Activities Completed</span>
+              <div class="metric-icon-box green">
+                <span class="material-symbols-outlined">task_alt</span>
+              </div>
+            </div>
+            <div>
+              <div class="metric-value" id="metricActivitiesVal">0 <span style="font-size: 15px; color: var(--text-muted); font-weight: 400;">/ 15 weekly</span></div>
+              <div class="metric-pill green" id="metricActivitiesPill">
+                <span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+                <span id="metricActivitiesPillText">Starting fresh (0%)</span>
+              </div>
+            </div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar" id="metricActivitiesBar" style="width: 0%; background-color: var(--primary);"></div>
+            </div>
+          </div>
+
+          <!-- Metric 2: Average Recall Score -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Average Recall Score</span>
+              <div class="metric-icon-box blue">
+                <span class="material-symbols-outlined">psychology</span>
+              </div>
+            </div>
+            <div>
+              <div class="metric-value" id="metricRecallVal">0%</div>
+              <div class="metric-pill green" id="metricRecallPill">
+                <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
+                <span id="metricRecallPillText">No sessions yet</span>
+              </div>
+            </div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar" id="metricRecallBar" style="width: 0%; background-color: var(--primary);"></div>
+            </div>
+          </div>
+
+          <!-- Metric 3: Current Streak -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Current Streak</span>
+              <div class="metric-icon-box amber">
+                <span class="material-symbols-outlined">local_fire_department</span>
+              </div>
+            </div>
+            <div>
+              <div class="metric-value" id="metricStreakVal">0 Days</div>
+              <div class="metric-pill amber" id="metricStreakPill">
+                <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
+                <span id="metricStreakPillText">Start your streak today</span>
+              </div>
+            </div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar" id="metricStreakBar" style="width: 0%; background-color: var(--tertiary-container);"></div>
+            </div>
+          </div>
+
+          <!-- Metric 4: Last Interaction -->
+          <div class="metric-card">
+            <div class="metric-top">
+              <span class="metric-label">Last Interaction</span>
+              <div class="metric-icon-box slate">
+                <span class="material-symbols-outlined">update</span>
+              </div>
+            </div>
+            <div>
+              <div class="metric-value" id="metricLastInteractionVal" style="font-size: 20px; padding-top: 6px;">No interactions yet</div>
+              <div style="font-size: 14px; color: var(--secondary); margin-top: 8px; display: flex; align-items: center; gap: 6px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--primary);"></span>
+                <span id="metricLastInteractionSub">Play a game or complete a routine to begin</span>
+              </div>
+            </div>
+            <div class="metric-progress">
+              <div class="metric-progress-bar" id="metricLastInteractionBar" style="width: 0%; background-color: var(--secondary);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2-Column Dashboard Layout -->
+        <div class="dashboard-grid">
+          <!-- Left Column -->
+          <div style="display: flex; flex-direction: column; gap: 28px;">
+            <!-- Weekly Cognitive Trends -->
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div>
+                  <h2>Weekly Cognitive Trends</h2>
+                  <p style="color: var(--text-muted); font-size: 14px;">Assessment results averaged over the past 7 days</p>
+                </div>
+                <span style="padding: 4px 12px; background-color: var(--surface-container); border-radius: 9999px; font-size: 13px; font-weight: 600;">Past 7 Days</span>
+              </div>
+
+              <!-- Trend 1 -->
+              <div class="trend-row">
+                <div class="trend-info">
+                  <span class="trend-title">
+                    <span class="material-symbols-outlined" style="color: var(--primary);">cognition</span>
+                    Memory &amp; Recall Retention
+                  </span>
+                  <span class="trend-val" id="trendMemoryVal" style="color: var(--primary);">0%</span>
+                </div>
+                <div class="trend-bar-bg">
+                  <div class="trend-bar-fill" id="trendMemoryBar" style="width: 0%; background-color: var(--primary);"></div>
+                </div>
+                <div class="trend-desc" id="trendMemoryDesc">No memory exercises recorded yet</div>
+              </div>
+
+              <!-- Trend 2 -->
+              <div class="trend-row">
+                <div class="trend-info">
+                  <span class="trend-title">
+                    <span class="material-symbols-outlined" style="color: var(--secondary);">filter_center_focus</span>
+                    Sustained Attention &amp; Focus
+                  </span>
+                  <span class="trend-val" id="trendAttentionVal" style="color: var(--secondary);">0%</span>
+                </div>
+                <div class="trend-bar-bg">
+                  <div class="trend-bar-fill" id="trendAttentionBar" style="width: 0%; background-color: var(--secondary);"></div>
+                </div>
+                <div class="trend-desc" id="trendAttentionDesc">No spatial or attention games recorded yet</div>
+              </div>
+
+              <!-- Trend 3 -->
+              <div class="trend-row">
+                <div class="trend-info">
+                  <span class="trend-title">
+                    <span class="material-symbols-outlined" style="color: var(--primary-fixed-dim);">translate</span>
+                    Language &amp; Semantic Fluency
+                  </span>
+                  <span class="trend-val" id="trendLanguageVal" style="color: var(--primary);">0%</span>
+                </div>
+                <div class="trend-bar-bg">
+                  <div class="trend-bar-fill" id="trendLanguageBar" style="width: 0%; background-color: var(--primary);"></div>
+                </div>
+                <div class="trend-desc" id="trendLanguageDesc">No word exercises recorded yet</div>
+              </div>
+
+              <!-- Trend 4 -->
+              <div class="trend-row">
+                <div class="trend-info">
+                  <span class="trend-title">
+                    <span class="material-symbols-outlined" style="color: var(--tertiary-container);">account_tree</span>
+                    Executive Function &amp; Problem Solving
+                  </span>
+                  <span class="trend-val" id="trendExecutiveVal" style="color: var(--tertiary);">0%</span>
+                </div>
+                <div class="trend-bar-bg">
+                  <div class="trend-bar-fill" id="trendExecutiveBar" style="width: 0%; background-color: var(--tertiary-container);"></div>
+                </div>
+                <div class="trend-desc" id="trendExecutiveDesc">No pattern exercises recorded yet</div>
+              </div>
+
+              <!-- Clinician Summary Note -->
+              <div class="clinician-strip">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--primary-fixed); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                    <span class="material-symbols-outlined">insights</span>
+                  </div>
+                  <div>
+                    <div style="font-weight: 600; font-size: 14px;">Clinician Summary Note</div>
+                    <div style="font-size: 13px; color: var(--text-muted);">Dr. Martinez verified overall stability. Next scheduled sync: June 4.</div>
+                  </div>
+                </div>
+                <button class="btn-secondary" style="min-height: 38px; padding: 6px 14px; font-size: 13px;" id="btnOpenClinicianModal">Read Note</button>
+              </div>
+            </div>
+
+            <!-- Recent Participant Activity Audit Log -->
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div>
+                  <h2>Recent Participant Activity</h2>
+                  <p style="color: var(--text-muted); font-size: 14px;">Chronological interaction history and verification</p>
+                </div>
+                <span style="font-size: 13px; color: var(--primary); font-weight: 600;">Live Auto-Update</span>
+              </div>
+
+              <div class="activity-list" id="caregiverRecentActivityList">
+                <!-- Activity 1 -->
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-icon-box">
+                      <span class="material-symbols-outlined">spellcheck</span>
+                    </div>
+                    <div>
+                      <div class="activity-name">Word Recall Match (Level 3)</div>
+                      <div class="activity-meta">Today • 10:45 AM • Duration 8m 12s</div>
+                    </div>
+                  </div>
+                  <div class="activity-right">
+                    <div>
+                      <div class="activity-score">Score: 92/100</div>
+                      <div class="activity-meta">Zero hint used</div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span>
+                  </div>
+                </div>
+
+                <!-- Activity 2 -->
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-icon-box">
+                      <span class="material-symbols-outlined">medication</span>
+                    </div>
+                    <div>
+                      <div class="activity-name">Morning Blood Pressure Medication</div>
+                      <div class="activity-meta">Today • 08:30 AM • Verified via Voice Prompt</div>
+                    </div>
+                  </div>
+                  <div class="activity-right">
+                    <div>
+                      <div class="activity-score">Confirmed</div>
+                      <div class="activity-meta">On schedule</div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span>
+                  </div>
+                </div>
+
+                <!-- Activity 3 -->
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-icon-box">
+                      <span class="material-symbols-outlined" style="color: var(--secondary);">directions_walk</span>
+                    </div>
+                    <div>
+                      <div class="activity-name">Garden Morning Walk Routine</div>
+                      <div class="activity-meta">Today • 07:45 AM • 24 mins recorded</div>
+                    </div>
+                  </div>
+                  <div class="activity-right">
+                    <div>
+                      <div class="activity-score" style="color: var(--on-surface);">Completed</div>
+                      <div class="activity-meta">1,420 steps</div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span>
+                  </div>
+                </div>
+
+                <!-- Activity 4 -->
+                <div class="activity-item">
+                  <div class="activity-left">
+                    <div class="activity-icon-box">
+                      <span class="material-symbols-outlined" style="color: var(--primary);">view_quilt</span>
+                    </div>
+                    <div>
+                      <div class="activity-name">Spatial Tile Ordering Puzzle</div>
+                      <div class="activity-meta">Yesterday • 04:15 PM • Duration 12m 40s</div>
+                    </div>
+                  </div>
+                  <div class="activity-right">
+                    <div>
+                      <div class="activity-score" style="color: var(--on-surface);">Score: 84/100</div>
+                      <div class="activity-meta">1 audio prompt</div>
+                    </div>
+                    <span class="material-symbols-outlined" style="color: var(--primary);">check_circle</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column -->
+          <div style="display: flex; flex-direction: column; gap: 28px;">
+            <!-- Daily Adherence Checklist -->
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h2>Daily Adherence</h2>
+                  <p style="color: var(--text-muted); font-size: 14px;">Live routine completion monitoring</p>
+                </div>
+                <span class="badge-done adherence-pct-pill" style="font-size: 13px;">75% Complete</span>
+              </div>
+
+              <div class="routine-list" id="caregiverRoutineList">
+                <div class="routine-item">
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="routine-check-box">
+                      <span class="material-symbols-outlined" style="font-size: 18px;">check</span>
+                    </div>
+                    <div>
+                      <div style="font-weight: 600; font-size: 15px;">Morning Garden Walk</div>
+                      <div style="font-size: 13px; color: var(--text-muted);">7:30 AM • Recorded</div>
+                    </div>
+                  </div>
+                  <span class="badge-done">Done</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stored Memory Anchors -->
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <h2>Stored Memory Anchors</h2>
+                  <p style="color: var(--text-muted); font-size: 14px;">Active familiar memory prompts logged</p>
+                </div>
+                <button class="btn-secondary" style="min-height: 36px; padding: 6px 12px; font-size: 13px;" id="btnAddMemoryAnchor" onclick="openAddMemoryModal()">
+                  <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary);">add_photo_alternate</span>
+                  <span>Add New</span>
+                </button>
+              </div>
+
+              <div class="memories-grid" id="caregiverMemoryThumbs">
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 13px; color: var(--text-muted);">
+                <span>Last recall prompt tested 2 days ago</span>
+                <span style="color: var(--primary); font-weight: 600;">96% Recognition</span>
+              </div>
+            </div>
+
+            <!-- Caregiver Reassurance Box -->
+            <div class="caregiver-action-card">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span class="material-symbols-outlined" style="color: var(--primary); font-size: 26px;">favorite</span>
+                <h3>Caregiver Actions &amp; Reassurance</h3>
+              </div>
+              <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;" id="caregiverReassuranceDesc">
+                Send a digital note that will appear gently on the participant's home screen, or adjust reminder schedules.
+              </p>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-primary" style="width: 100%; justify-content: center;" id="btnLeaveNote">
+                  <span class="material-symbols-outlined">sticky_note_2</span>
+                  <span id="btnLeaveWarmNoteText">Leave a Warm Reassurance Note</span>
+                </button>
+                <button class="btn-secondary" style="width: 100%; justify-content: center;" id="btnUpdateReminders">
+                  <span class="material-symbols-outlined" style="color: var(--secondary);">notifications_active</span>
+                  <span>Update Medication Reminders</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 2: PARTICIPANT / ELDERLY DASHBOARD -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-elderly-view">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h1 style="font-size: 34px; margin-bottom: 6px;" id="elderlyGreetingTitle">Good morning ☀️</h1>
+            <p style="color: var(--text-muted); font-size: 18px;">Let's make today's memory journey joyful, calm, and reassuring.</p>
+          </div>
+          <button class="btn-elderly-caregiver-overview" id="btnElderlyCaregiverOverview" onclick="openCaregiverOverviewFromElderly()" type="button" aria-label="View Caregiver Overview">
+            <span class="material-symbols-outlined">supervisor_account</span>
+            <span>Caregiver Overview</span>
+          </button>
+        </div>
+
+        <!-- Live Warm Caregiver Note Banner -->
+        <div id="elderlyWarmNoteContainer"></div>
+
+        <!-- Participant Daily Highlight Banner -->
+        <div class="card" style="background: linear-gradient(135deg, #176B4D 0%, #1F3042 100%); color: #ffffff; padding: 32px; margin-bottom: 28px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+            <div style="max-width: 620px;">
+              <span style="background: rgba(255,255,255,0.18); padding: 4px 12px; border-radius: 9999px; font-size: 13px; font-weight: 600; text-transform: uppercase;">Daily Recommended</span>
+              <h2 style="color: #ffffff; font-size: 26px; margin: 12px 0 8px;">Morning Garden Word Matching</h2>
+              <p style="color: #E4F3FB; font-size: 16px; margin-bottom: 18px;">A 5-minute gentle memory exercise with familiar flower names and garden tools you love.</p>
+              <button class="btn-primary" style="background: #A4F3CC; color: #002114; font-weight: 700;" onclick="launchCardMemoryGame()">
+                <span class="material-symbols-outlined">play_arrow</span>
+                <span>Play Today's Exercise</span>
+              </button>
+            </div>
+            <div style="width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;">
+              <span class="material-symbols-outlined" style="font-size: 72px; color: #A4F3CC;">psychology</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participant 3-Tile Action Hub -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px;">
+          <div class="card" style="cursor: pointer;" onclick="switchTab('games-view')">
+            <div class="metric-icon-box green" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 16px;">
+              <span class="material-symbols-outlined" style="font-size: 28px;">extension</span>
+            </div>
+            <h3>Cognitive Games</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Fun exercises to stimulate word recall, attention, and visual matching.</p>
+            <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">Explore 3 Games &rarr;</span>
+          </div>
+
+          <div class="card" style="cursor: pointer;" onclick="switchTab('memory-view')">
+            <div class="metric-icon-box amber" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 16px;">
+              <span class="material-symbols-outlined" style="font-size: 28px;">auto_stories</span>
+            </div>
+            <h3>Memory Photo Album</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Revisit cherished family moments, pets, and favorite places with voice stories.</p>
+            <span style="color: var(--tertiary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">View Memories &rarr;</span>
+          </div>
+
+          <div class="card" style="cursor: pointer;" onclick="switchTab('routine-view')">
+            <div class="metric-icon-box blue" style="width: 48px; height: 48px; border-radius: 12px; margin-bottom: 16px;">
+              <span class="material-symbols-outlined" style="font-size: 28px;">calendar_today</span>
+            </div>
+            <h3>Today's Routine</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Gentle reminders for hydration, walking, and prescription schedules.</p>
+            <span style="color: var(--secondary); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">Check Schedule &rarr;</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 3: COGNITIVE GAMES HUB -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-games-view">
+        <div style="margin-bottom: 24px;">
+          <h1>Cognitive Training Games</h1>
+          <p style="color: var(--text-muted); font-size: 16px;">Scientifically designed exercises to exercise recall, spatial reasoning, and attention.</p>
+        </div>
+
+        <div class="games-grid">
+          <!-- Game 1 -->
+          <div class="game-card">
+            <div>
+              <div class="game-icon-circle" style="background-color: var(--primary-light-bg); color: var(--primary);">
+                <span class="material-symbols-outlined">style</span>
+              </div>
+              <h3>Card Memory Match</h3>
+              <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Flip cards to reveal matching pictures of nature, fruits, and daily items.</p>
+              <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+                <span class="badge-done">Recall</span>
+                <span class="badge-upcoming">Level 1 - 3</span>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="launchGame('Card Memory Match')">Play Game</button>
+          </div>
+
+          <!-- Game 2 -->
+          <div class="game-card">
+            <div>
+              <div class="game-icon-circle" style="background-color: var(--secondary-container); color: var(--secondary-dark);">
+                <span class="material-symbols-outlined">view_quilt</span>
+              </div>
+              <h3>Spatial Pattern Match</h3>
+              <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Remember the sequence of highlighted squares and repeat them comfortably.</p>
+              <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+                <span class="badge-done">Attention</span>
+                <span class="badge-upcoming">Adaptive</span>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="launchGame('Spatial Pattern Match')">Play Game</button>
+          </div>
+
+          <!-- Game 3 -->
+          <div class="game-card">
+            <div>
+              <div class="game-icon-circle" style="background-color: var(--tertiary-fixed); color: var(--tertiary);">
+                <span class="material-symbols-outlined">photo_library</span>
+              </div>
+              <h3>Picture Recall Quiz</h3>
+              <p style="color: var(--text-muted); font-size: 14px; margin: 8px 0 16px;">Observe an image for 10 seconds, then identify which details you remember.</p>
+              <div style="display: flex; gap: 8px; margin-bottom: 18px;">
+                <span class="badge-done">Visual Focus</span>
+                <span class="badge-upcoming">Personalized</span>
+              </div>
+            </div>
+            <button class="btn-primary" onclick="launchGame('Picture Recall Quiz')">Play Game</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 4: MY PROGRESS -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-progress-view">
+        <div style="margin-bottom: 24px;">
+          <h1>Cognitive Progress &amp; Milestones</h1>
+          <p style="color: var(--text-muted); font-size: 16px;">Longitudinal tracking across memory stability, reaction speed, and daily engagement.</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+          <h3>30-Day Cognitive Vitality Score</h3>
+          <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Aggregated across memory games, routine responses, and speech clarity.</p>
+          <div style="display: flex; align-items: baseline; gap: 12px;">
+            <div style="font-family: var(--font-headline); font-size: 48px; font-weight: 700; color: var(--primary);" id="progressVitalityScore">0.0</div>
+            <span class="badge-done" style="font-size: 14px;" id="progressVitalityBadge">New Profile • No sessions yet</span>
+          </div>
+          <div class="metric-progress" style="height: 10px; margin-top: 16px;">
+            <div class="metric-progress-bar" id="progressVitalityBar" style="width: 0%; background-color: var(--primary);"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recent Cognitive Milestones</h3>
+          <div class="activity-list" style="margin-top: 14px;" id="progressMilestonesList">
+            <div class="activity-item">
+              <div class="activity-left">
+                <div class="activity-icon-box" style="background-color: var(--surface-container); color: var(--secondary);">
+                  <span class="material-symbols-outlined">flag</span>
+                </div>
+                <div>
+                  <div class="activity-name">Welcome to Cognitive Wellness</div>
+                  <div class="activity-meta">Play your first cognitive training game to unlock your milestones!</div>
+                </div>
+              </div>
+              <span class="badge-upcoming">Get Started</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 5: MEMORY ASSISTANT & ANCHORS -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-memory-view">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h1>Memory Anchors &amp; Stories</h1>
+            <p style="color: var(--text-muted); font-size: 16px;">Personal photos and memories used to gently reinforce recall and emotional grounding.</p>
+          </div>
+          <button class="btn-primary" onclick="openAddMemoryModal()">
+            <span class="material-symbols-outlined">add_photo_alternate</span>
+            <span>Upload Memory</span>
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;" id="memoryAnchorsGallery">
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted); font-size: 15px;">
+            <span class="material-symbols-outlined" style="font-size: 52px; color: var(--secondary); display: block; margin-bottom: 12px;">photo_library</span>
+            <strong style="font-size: 18px; color: var(--on-surface); display: block; margin-bottom: 6px;">No Memory Anchors Uploaded Yet</strong>
+            <span>Personal family photos, pets, and favorite places uploaded for this participant will appear here.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 6: DAILY ROUTINE & REMINDERS -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-routine-view">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h1>Daily Routine &amp; Medication Schedule</h1>
+            <p style="color: var(--text-muted); font-size: 16px;">Scheduled touchpoints designed to keep days structured, predictable, and stress-free.</p>
+          </div>
+          <button class="btn-primary" onclick="openAddReminderModal()">
+            <span class="material-symbols-outlined">add</span>
+            <span>Add Reminder</span>
+          </button>
+        </div>
+
+        <div class="card">
+          <div class="routine-list" id="interactiveRoutineList">
+            <!-- Item 1 -->
+            <div class="routine-item">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="routine-check-box">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">check</span>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px;">Morning Garden Walk</div>
+                  <div style="font-size: 14px; color: var(--text-muted);">07:30 AM • 24 minutes recorded (1,420 steps)</div>
+                </div>
+              </div>
+              <span class="badge-done">Completed</span>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="routine-item">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="routine-check-box">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">check</span>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px;">Blood Pressure Medication (Lisinopril 10mg)</div>
+                  <div style="font-size: 14px; color: var(--text-muted);">08:30 AM • Confirmed via Voice Response</div>
+                </div>
+              </div>
+              <span class="badge-done">Confirmed</span>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="routine-item">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="routine-check-box">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">check</span>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px;">Word Recall Exercise</div>
+                  <div style="font-size: 14px; color: var(--text-muted);">10:30 AM • Score 92/100</div>
+                </div>
+              </div>
+              <span class="badge-done">Completed</span>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="routine-item upcoming">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="routine-check-box pending">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">schedule</span>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px;">Afternoon Hydration &amp; Tea</div>
+                  <div style="font-size: 14px; color: var(--text-muted);">02:00 PM • Prompt scheduled with gentle chime</div>
+                </div>
+              </div>
+              <button class="btn-secondary" style="min-height: 36px; padding: 4px 12px; font-size: 13px;" onclick="markRoutineDone(this)">Mark Complete</button>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="routine-item upcoming">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="routine-check-box pending">
+                  <span class="material-symbols-outlined" style="font-size: 20px;">schedule</span>
+                </div>
+                <div>
+                  <div style="font-weight: 600; font-size: 16px;">Evening Family Phone Call</div>
+                  <div style="font-size: 14px; color: var(--text-muted);">06:30 PM • Evening Family / Caregiver Check-In</div>
+                </div>
+              </div>
+              <span class="badge-upcoming">Scheduled</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- VIEW 7: SETTINGS & ACCESSIBILITY -->
+      <!-- ============================================================== -->
+      <section class="view-section" id="view-settings-view">
+        <div style="margin-bottom: 24px;">
+          <h1>Settings &amp; Accessibility (WCAG AAA)</h1>
+          <p style="color: var(--text-muted); font-size: 16px;">Tailor visual readability, sound prompts, and voice speed for maximum cognitive comfort.</p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 20px; max-width: 720px;">
+          <!-- Account & Session Section (User Requirements #5 & #6) -->
+          <div class="card" style="border: 2px solid var(--outline-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+              <div>
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                  <span class="material-symbols-outlined" style="color: var(--primary);">manage_accounts</span>
+                  <span>Account &amp; Authenticated Session</span>
+                </h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Current session details, permissions, and logout</p>
+              </div>
+              <button class="btn-logout" id="btnSettingsLogout" onclick="handleLogout()" type="button" aria-label="Log Out from Session">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Log Out</span>
+              </button>
+            </div>
+
+            <div class="account-badge-card" id="settingsAccountCard">
+              <div>
+                <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.85;" id="settingsRoleType">Session: Not Authenticated</div>
+                <div style="font-size: 22px; font-weight: 700; margin: 4px 0;" id="settingsUserName">Guest User</div>
+                <div style="font-size: 14px; opacity: 0.9;" id="settingsUserMeta">Sign in to access personalized data</div>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn-secondary" style="background: rgba(255,255,255,0.18); color: #ffffff; border: 1px solid rgba(255,255,255,0.35); min-height: 42px;" onclick="switchTab('login-view')">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">swap_horiz</span>
+                  <span>Switch Role</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Caregiver Danger Zone (User Requirement #3: Account Deletion) -->
+          <div class="card danger-zone-card" id="caregiverDangerZoneCard" style="display: none; border: 1.5px solid #FFDAD6; background: #FFF8F7;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+              <div>
+                <h3 style="color: #BA1A1A; display: flex; align-items: center; gap: 8px;">
+                  <span class="material-symbols-outlined" style="color: #BA1A1A;">warning</span>
+                  <span>Caregiver Account Deletion</span>
+                </h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                  Permanently delete your caregiver account. Your assigned patients will be safely unlinked and their records preserved.
+                </p>
+              </div>
+              <button class="btn-danger" id="btnDeleteCaregiverAccount" onclick="confirmDeleteCaregiverAccount()" type="button" aria-label="Delete Caregiver Account">
+                <span class="material-symbols-outlined">delete_forever</span>
+                <span>Delete Account</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Visual Accessibility</h3>
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600;">Text Sizing Mode</div>
+                  <div style="font-size: 13px; color: var(--text-muted);">Adjust baseline font scale across all panels</div>
+                </div>
+                <select id="textSizeSelect" style="padding: 8px 14px; border-radius: 8px; border: 1px solid var(--outline-border); font-size: 15px;">
+                  <option value="standard">Standard (16px / 18px)</option>
+                  <option value="large">Large (20px / 22px)</option>
+                  <option value="xlarge">Extra Large (24px)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600;">High Contrast Mode</div>
+                  <div style="font-size: 13px; color: var(--text-muted);">Enforce maximum contrast borders and pure dark slate text</div>
+                </div>
+                <input type="checkbox" id="chkContrast" style="width: 22px; height: 22px; accent-color: var(--primary);">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Voice Assistant Preferences</h3>
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600;">Speech Rate / Pacing</div>
+                  <div style="font-size: 13px; color: var(--text-muted);">Unhurried, calm conversational pacing</div>
+                </div>
+                <select style="padding: 8px 14px; border-radius: 8px; border: 1px solid var(--outline-border); font-size: 15px;">
+                  <option>Calm &amp; Gentle (0.85x speed)</option>
+                  <option>Standard (1.0x speed)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Shared Interactive Modals -->
+  <div class="modal-backdrop" id="genericModal" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 id="modalTitle">Modal</h2>
+        <button onclick="closeModal()" style="border: none; background: none; cursor: pointer; font-size: 24px; color: var(--text-muted);">&times;</button>
+      </div>
+      <div id="modalBody" style="font-size: 15px; color: var(--on-surface-variant); line-height: 1.6; margin-bottom: 24px;"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button class="btn-secondary" onclick="closeModal()">Close</button>
+        <button class="btn-primary" id="modalConfirmBtn" onclick="closeModal()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Patient Modal (User Requirement #2) -->
+  <div class="modal-backdrop" id="addPatientModal" style="display: none;">
+    <div class="modal-content" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h2 style="display: flex; align-items: center; gap: 8px; font-size: 20px;">
+          <span class="material-symbols-outlined" style="color: var(--primary);">person_add</span>
+          <span>Add New Patient</span>
+        </h2>
+        <button onclick="closeAddPatientModal()" style="border: none; background: none; cursor: pointer; font-size: 24px; color: var(--text-muted);">&times;</button>
+      </div>
+      <div id="addPatientAlert" style="display: none;" class="auth-alert-box"></div>
+      <form id="addPatientForm" onsubmit="handleAddPatientSubmit(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" for="newPatientName">Patient Full Name *</label>
+          <input type="text" id="newPatientName" class="form-input" placeholder="e.g. Arthur Pendelton" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" for="newPatientUsername">Username (Login Handle) *</label>
+          <input type="text" id="newPatientUsername" class="form-input" placeholder="e.g. arthur74" required autocomplete="off">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+          <div class="form-group">
+            <label class="form-label" for="newPatientAge">Age (Years) *</label>
+            <input type="number" id="newPatientAge" class="form-input" placeholder="e.g. 74" min="1" max="120" value="74" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="newPatientPassword">Password *</label>
+            <input type="password" id="newPatientPassword" class="form-input" placeholder="Default: password123" value="password123" required>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label" for="newPatientRelationship">Relationship / Care Notes (Optional)</label>
+          <input type="text" id="newPatientRelationship" class="form-input" placeholder="e.g. Father, Client, Recovering from memory fatigue">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 12px;">
+          <button type="button" class="btn-secondary" onclick="closeAddPatientModal()">Cancel</button>
+          <button type="submit" class="btn-primary" id="btnSubmitAddPatient">
+            <span class="material-symbols-outlined">save</span>
+            <span id="btnSubmitAddPatientText">Save Patient</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Patient Confirmation Modal (User Requirement #2) -->
+  <div class="modal-backdrop" id="deletePatientModal" style="display: none;">
+    <div class="modal-content" style="max-width: 480px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFDAD6; color: #BA1A1A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span class="material-symbols-outlined" style="font-size: 26px;">delete_forever</span>
+        </div>
+        <div>
+          <h2 style="font-size: 20px; color: #BA1A1A;">Delete Patient</h2>
+          <span style="font-size: 13px; color: var(--text-muted);">Irreversible Action</span>
+        </div>
+      </div>
+      <p style="font-size: 15px; color: var(--on-surface); line-height: 1.6; margin-bottom: 16px; font-weight: 500;">
+        Are you sure you want to delete this patient? This action cannot be undone.
+      </p>
+      <div id="deletePatientTargetBox" style="background: var(--surface-container-low); border: 1px solid var(--outline-border); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-weight: 600;">
+        Patient: <span id="deletePatientTargetName">Patient Name</span>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button type="button" class="btn-secondary" onclick="closeDeletePatientModal()">Cancel</button>
+        <button type="button" class="btn-danger" id="btnConfirmDeletePatientAction" onclick="executeDeletePatient()">
+          <span class="material-symbols-outlined">delete</span>
+          <span>Delete Patient</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Caregiver Account Confirmation Modal (User Requirement #3) -->
+  <div class="modal-backdrop" id="deleteCaregiverModal" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+        <div style="width: 44px; height: 44px; border-radius: 50%; background: #FFDAD6; color: #BA1A1A; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          <span class="material-symbols-outlined" style="font-size: 28px;">warning</span>
+        </div>
+        <div>
+          <h2 style="font-size: 20px; color: #BA1A1A;">Delete Caregiver Account</h2>
+          <span style="font-size: 13px; color: var(--text-muted);">Permanent Account Removal</span>
+        </div>
+      </div>
+      <div style="background: #FFF5F5; border-left: 4px solid #BA1A1A; padding: 12px 14px; border-radius: 4px; margin-bottom: 16px; font-size: 14px; line-height: 1.5; color: #93000A;">
+        <strong>Warning:</strong> Are you sure you want to delete your caregiver account? All your caregiver settings will be permanently removed. Your assigned patients will be safely unlinked. This action cannot be undone.
+      </div>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+        After account deletion, your session will be cleared and you will be returned to the Login screen.
+      </p>
+      <div style="display: flex; justify-content: flex-end; gap: 12px;">
+        <button type="button" class="btn-secondary" onclick="closeDeleteCaregiverModal()">Cancel</button>
+        <button type="button" class="btn-danger" id="btnConfirmDeleteCaregiverAction" onclick="executeDeleteCaregiverAccount()">
+          <span class="material-symbols-outlined">delete_forever</span>
+          <span>Permanently Delete Account</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

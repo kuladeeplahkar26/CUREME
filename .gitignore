@@ -1,0 +1,45 @@
+# Security, Environment, and Secret Credentials
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+secrets.toml
+.streamlit/secrets.toml
+
+# Databases and Sensitive User Data
+*.db
+*.sqlite
+*.sqlite3
+cognitive_care.db
+
+# Internal Project Documents & Specifications
+implementation_plan.md
+prd_extracted.txt
+*.docx
+
+# Python Bytecode and Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
+ENV/
+
+# Testing, Linter, and Tool Caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Logs and System Files
+*.log
+.DS_Store
+Thumbs.db
+desktop.ini
