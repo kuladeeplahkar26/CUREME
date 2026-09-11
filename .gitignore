@@ -40,6 +40,7 @@ htmlcov/
 
 # Logs and System Files
 *.log
+*.exe
 .DS_Store
 Thumbs.db
-desktop.ini
+desktop.ini
