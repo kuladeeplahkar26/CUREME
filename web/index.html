@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NEUROVIA - Cognitive Wellness Platform</title>
+  <title>MEMOAID - Cognitive Wellness Platform</title>
   <meta name="description" content="A restorative, dignified, and ultra-legible digital sanctuary for cognitive care and caregiver oversight.">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -17,41 +17,41 @@
           <span class="material-symbols-outlined">spa</span>
         </div>
         <div>
-          <div class="brand-title">NEUROVIA</div>
+          <div class="brand-title">MEMOAID</div>
           <span class="brand-subtitle">Cognitive Wellness</span>
         </div>
       </div>
 
       <nav class="sidebar-nav" id="mainNav">
-        <button class="nav-item" data-target="elderly-view" id="nav-home">
+        <button class="nav-item" data-target="elderly-view" data-role="elderly" id="nav-home">
           <span class="material-symbols-outlined">home</span>
           <span>Home (Participant)</span>
         </button>
-        <button class="nav-item" data-target="caregiver-view" id="nav-caregiver">
+        <button class="nav-item" data-target="caregiver-view" data-role="caregiver" id="nav-caregiver">
           <span class="material-symbols-outlined">supervisor_account</span>
           <span>Caregiver Overview</span>
         </button>
-        <button class="nav-item" data-target="games-view" id="nav-games">
+        <button class="nav-item" data-target="games-view" data-role="elderly" id="nav-games">
           <span class="material-symbols-outlined">extension</span>
           <span>Cognitive Games</span>
         </button>
-        <button class="nav-item" data-target="progress-view" id="nav-progress">
+        <button class="nav-item" data-target="progress-view" data-role="elderly" id="nav-progress">
           <span class="material-symbols-outlined">trending_up</span>
           <span>My Progress</span>
         </button>
-        <button class="nav-item" data-target="memory-view" id="nav-memory">
+        <button class="nav-item" data-target="memory-view" data-role="elderly" id="nav-memory">
           <span class="material-symbols-outlined">psychology</span>
           <span>Memory Assistant</span>
         </button>
-        <button class="nav-item" data-target="routine-view" id="nav-routine">
+        <button class="nav-item" data-target="routine-view" data-role="elderly" id="nav-routine">
           <span class="material-symbols-outlined">calendar_today</span>
           <span>Daily Routine</span>
         </button>
-        <button class="nav-item" data-target="settings-view" id="nav-settings">
+        <button class="nav-item" data-target="settings-view" data-role="all" id="nav-settings">
           <span class="material-symbols-outlined">accessibility_new</span>
           <span>Settings</span>
         </button>
-        <button class="nav-item active" data-target="login-view" id="nav-login">
+        <button class="nav-item active" data-target="login-view" data-role="all" id="nav-login">
           <span class="material-symbols-outlined">login</span>
           <span id="navLoginText">Sign In / Role</span>
         </button>
@@ -82,7 +82,24 @@
     <header class="top-header">
       <div class="header-status">
         <span class="material-symbols-outlined" style="color: var(--primary);">schedule</span>
-        <span id="liveClockText">Today, 10:30 AM • Calm Morning Routine</span>
+        <span id="liveClockText"></span>
+        <script>
+          (function() {
+            function getRoutine(h) {
+              if (h >= 5 && h < 9) return 'Calm Morning Routine';
+              if (h >= 9 && h < 12) return 'Morning Activity Session';
+              if (h >= 12 && h < 14) return 'Midday Rest & Lunch';
+              if (h >= 14 && h < 17) return 'Afternoon Exercise';
+              if (h >= 17 && h < 19) return 'Evening Wind-Down';
+              if (h >= 19 && h < 21) return 'Night Memory Reflection';
+              return 'Rest & Sleep Time';
+            }
+            var d = new Date(), h = d.getHours(), m = String(d.getMinutes()).padStart(2, '0');
+            var ap = h >= 12 ? 'PM' : 'AM', h12 = h % 12 || 12;
+            var el = document.getElementById('liveClockText');
+            if (el) el.textContent = 'Today, ' + h12 + ':' + m + ' ' + ap + ' • ' + getRoutine(h);
+          })();
+        </script>
       </div>
 
       <div class="header-actions">
@@ -112,7 +129,7 @@
           <div class="auth-header-card">
             <div class="auth-brand-badge">
               <span class="material-symbols-outlined" style="font-size: 20px;">spa</span>
-              <span>NEUROVIA HEALTHCARE PORTAL</span>
+              <span>MEMOAID HEALTHCARE PORTAL</span>
             </div>
             <h1 class="auth-title">Welcome to Cognitive Wellness</h1>
             <p class="auth-subtitle">Choose your login option below to access personalized routines, cognitive exercises, or caregiver oversight.</p>
@@ -618,7 +635,7 @@
             <h1 style="font-size: 34px; margin-bottom: 6px;" id="elderlyGreetingTitle">Good morning ☀️</h1>
             <p style="color: var(--text-muted); font-size: 18px;">Let's make today's memory journey joyful, calm, and reassuring.</p>
           </div>
-          <button class="btn-elderly-caregiver-overview" id="btnElderlyCaregiverOverview" onclick="openCaregiverOverviewFromElderly()" type="button" aria-label="View Caregiver Overview">
+          <button class="btn-elderly-caregiver-overview" id="btnElderlyCaregiverOverview" onclick="openCaregiverOverviewFromElderly()" type="button" aria-label="View Caregiver Overview" style="display: none;">
             <span class="material-symbols-outlined">supervisor_account</span>
             <span>Caregiver Overview</span>
           </button>
@@ -1112,6 +1129,7 @@
     </div>
   </div>
 
+  <script src="jspdf.umd.min.js"></script>
   <script src="api.js"></script>
   <script src="app.js"></script>
 </body>

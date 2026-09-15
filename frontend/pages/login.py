@@ -10,16 +10,16 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="Sign In - NEUROVIA", layout="centered")
+st.set_page_config(page_title="Sign In - MEMOAID", layout="centered")
 initialize_session_state()
 styles.apply_styles()
 
-# NEUROVIA Header
+# MEMOAID Header
 st.markdown("""
 <div style="text-align: center; margin-top: 24px; margin-bottom: 28px;">
     <div style="display: inline-flex; align-items: center; gap: 10px; background: #1D2B3A; color: white; padding: 10px 20px; border-radius: 12px; margin-bottom: 16px;">
         <span class="material-symbols-outlined" style="color: #1FA77A; font-size: 24px;">spa</span>
-        <span style="font-weight: 700; font-size: 1.3rem; letter-spacing: -0.01em;">NEUROVIA</span>
+        <span style="font-weight: 700; font-size: 1.3rem; letter-spacing: -0.01em;">MEMOAID</span>
     </div>
     <h1 style="color: #172536; font-size: 2.2rem; margin-bottom: 8px;">Cognitive Wellness Platform</h1>
     <p style="color: #6B7680; font-size: 1.05rem; max-width: 480px; margin: 0 auto;">Sign in to access personalized memory support, cognitive activities, and caregiver insights.</p>
@@ -63,7 +63,7 @@ with login_card:
                             st.switch_page("pages/caregiver_dashboard.py")
 
 # Clean, unintrusive New Account registration expander
-with st.expander("New to NEUROVIA? Create your account"):
+with st.expander("New to MEMOAID? Create your account"):
     with st.form("register_form"):
         st.markdown("<h4 style='color: #172536; margin-top: 0;'>Create a New Account</h4>", unsafe_allow_html=True)
         

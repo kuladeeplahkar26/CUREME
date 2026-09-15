@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NEUROVIA - Cognitive Wellness Design System
+   MEMOAID - Cognitive Wellness Design System
    Matches DESIGN.md specifications & WCAG AAA compliance standards
    ========================================================================== */
 
@@ -1628,6 +1628,15 @@ body.auth-locked .auth-card {
 
 body.auth-locked .btn-voice,
 body.auth-locked .btn-emergency {
+  display: none !important;
+}
+
+/* Role-Based Navigation Visibility */
+.nav-hidden {
+  display: none !important;
+}
+
+.switch-hidden {
   display: none !important;
 }
 

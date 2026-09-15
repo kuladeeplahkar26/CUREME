@@ -12,7 +12,7 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import get_summary_stats, initialize_session_state
 
-st.set_page_config(page_title="NEUROVIA - Home", layout="wide")
+st.set_page_config(page_title="MEMOAID - Home", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()

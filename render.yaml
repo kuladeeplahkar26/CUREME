@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: neurovia-care
+    name: memoaid-care
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt

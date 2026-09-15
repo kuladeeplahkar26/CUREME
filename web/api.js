@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NEUROVIA - Live Backend API Client
+   MEMOAID - Live Backend API Client
    Connects to FastAPI backend at http://127.0.0.1:8000 with local fallback
    ========================================================================== */
 

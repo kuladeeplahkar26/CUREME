@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NEUROVIA - Web Application Logic with Full Live Backend Integration
+   MEMOAID - Web Application Logic with Full Live Backend Integration
    ========================================================================== */
 
 async function startApp() {
@@ -26,6 +26,48 @@ async function startApp() {
 
   let currentUserId = getActiveUserId();
   let currentRole = currentSession ? currentSession.role : 'guest';
+  let isViewingAsParticipant = false;
+
+  // ─────────────────────────────────────────────────────────────
+  // ROUTE PERMISSION MAPS
+  // ─────────────────────────────────────────────────────────────
+  const elderlyAllowedViews = ['login-view', 'elderly-view', 'games-view', 'progress-view', 'memory-view', 'routine-view', 'settings-view'];
+  const caregiverAllowedViews = ['login-view', 'caregiver-view', 'settings-view'];
+  const caregiverParticipantViews = ['login-view', 'caregiver-view', 'settings-view', 'elderly-view', 'games-view', 'progress-view', 'memory-view', 'routine-view'];
+
+  const hashToView = {
+    '#login': 'login-view',
+    '#elderly/dashboard': 'elderly-view',
+    '#games': 'games-view',
+    '#progress': 'progress-view',
+    '#memory': 'memory-view',
+    '#routine': 'routine-view',
+    '#caregiver/dashboard': 'caregiver-view',
+    '#settings': 'settings-view'
+  };
+
+  const viewToHash = {};
+  for (const [hash, view] of Object.entries(hashToView)) {
+    viewToHash[view] = hash;
+  }
+
+  function getAllowedViews() {
+    if (!currentSession) return ['login-view'];
+    if (currentSession.role === 'elderly') return elderlyAllowedViews;
+    if (currentSession.role === 'caregiver') {
+      return isViewingAsParticipant ? caregiverParticipantViews : caregiverAllowedViews;
+    }
+    return ['login-view'];
+  }
+
+  function getDefaultView() {
+    if (!currentSession) return 'login-view';
+    if (currentSession.role === 'elderly') return 'elderly-view';
+    if (currentSession.role === 'caregiver') {
+      return isViewingAsParticipant ? 'elderly-view' : 'caregiver-view';
+    }
+    return 'login-view';
+  }
 
   function getInitials(name) {
     if (!name) return 'NV';
@@ -42,6 +84,74 @@ async function startApp() {
   }
 
   window.generateAvatarDataUri = generateAvatarDataUri;
+
+  // ─────────────────────────────────────────────────────────────
+  // ROLE-BASED NAV VISIBILITY
+  // ─────────────────────────────────────────────────────────────
+  function updateNavVisibility() {
+    const btnSwitch = document.getElementById('btnSwitchPerspective');
+    const btnElderlyCaregiverOverview = document.getElementById('btnElderlyCaregiverOverview');
+    const allNavBtns = document.querySelectorAll('.nav-item');
+
+    allNavBtns.forEach(btn => {
+      const role = btn.getAttribute('data-role');
+      const target = btn.getAttribute('data-target');
+
+      if (!currentSession) {
+        // Unauthenticated: show only login
+        if (target === 'login-view') {
+          btn.classList.remove('nav-hidden');
+        } else {
+          btn.classList.add('nav-hidden');
+        }
+        return;
+      }
+
+      if (role === 'all') {
+        btn.classList.remove('nav-hidden');
+        return;
+      }
+
+      if (currentSession.role === 'elderly') {
+        // Elderly: show elderly + all, hide caregiver
+        if (role === 'elderly' || role === 'all') {
+          btn.classList.remove('nav-hidden');
+        } else {
+          btn.classList.add('nav-hidden');
+        }
+      } else if (currentSession.role === 'caregiver') {
+        if (isViewingAsParticipant) {
+          // Caregiver in participant view: show all relevant nav
+          btn.classList.remove('nav-hidden');
+        } else {
+          // Caregiver default: only caregiver + all
+          if (role === 'caregiver' || role === 'all') {
+            btn.classList.remove('nav-hidden');
+          } else {
+            btn.classList.add('nav-hidden');
+          }
+        }
+      }
+    });
+
+    // Switch button: only visible for caregivers
+    if (btnSwitch) {
+      if (currentSession && currentSession.role === 'caregiver') {
+        btnSwitch.classList.remove('switch-hidden');
+      } else {
+        btnSwitch.classList.add('switch-hidden');
+      }
+    }
+
+    // "Caregiver Overview" button on elderly dashboard: only for caregiver in participant view
+    if (btnElderlyCaregiverOverview) {
+      if (currentSession && currentSession.role === 'caregiver' && isViewingAsParticipant) {
+        btnElderlyCaregiverOverview.style.display = '';
+      } else {
+        btnElderlyCaregiverOverview.style.display = 'none';
+      }
+    }
+  }
 
   function syncAuthUI() {
     const profileName = document.getElementById('profileName');
@@ -60,14 +170,30 @@ async function startApp() {
       document.body.classList.remove('auth-locked');
       const isCaregiver = currentSession.role === 'caregiver';
       if (profileName) profileName.textContent = currentSession.name;
-      if (profileRoleLabel) profileRoleLabel.textContent = isCaregiver ? 'Caregiver Oversight' : 'Participant Active';
+      if (profileRoleLabel) {
+        if (isCaregiver && isViewingAsParticipant) {
+          profileRoleLabel.textContent = 'Viewing as Participant';
+        } else if (isCaregiver) {
+          profileRoleLabel.textContent = 'Caregiver Oversight';
+        } else {
+          profileRoleLabel.textContent = 'Participant Active';
+        }
+      }
       if (headerAuthText) headerAuthText.textContent = `${currentSession.name.split(' ')[0]} (${isCaregiver ? 'Caregiver' : 'Patient'})`;
-      if (navLoginText) navLoginText.textContent = 'Account / Switch';
+      if (navLoginText) navLoginText.textContent = isCaregiver ? 'Account' : 'Account';
       if (settingsRoleType) settingsRoleType.textContent = `Authenticated Role: ${isCaregiver ? 'Caregiver' : 'Elderly Patient'}`;
       if (settingsUserName) settingsUserName.textContent = currentSession.name;
       if (settingsUserMeta) settingsUserMeta.textContent = `Username: @${currentSession.username} • User ID #${currentSession.user_id}`;
-      if (switchBtnText) switchBtnText.textContent = isCaregiver ? 'Switch to Participant' : 'Switch to Caregiver';
-      if (elderlyGreetingTitle) elderlyGreetingTitle.textContent = isCaregiver ? `Caregiver Oversight ☀️` : `Good morning, ${currentSession.name.split(' ')[0]} ☀️`;
+      if (switchBtnText) switchBtnText.textContent = isViewingAsParticipant ? 'Back to Caregiver Overview' : 'Switch to Participant View';
+      if (elderlyGreetingTitle) {
+        if (isCaregiver && isViewingAsParticipant) {
+          elderlyGreetingTitle.textContent = `Participant View ☀️`;
+        } else if (isCaregiver) {
+          elderlyGreetingTitle.textContent = `Caregiver Oversight ☀️`;
+        } else {
+          elderlyGreetingTitle.textContent = `Good morning, ${currentSession.name.split(' ')[0]} ☀️`;
+        }
+      }
       if (profileImg) {
         profileImg.src = generateAvatarDataUri(currentSession.name, currentSession.role);
       }
@@ -90,6 +216,8 @@ async function startApp() {
       }
       if (dangerZone) dangerZone.style.display = 'none';
     }
+
+    updateNavVisibility();
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -123,16 +251,12 @@ async function startApp() {
   function startLiveClock() {
     updateLiveClock(); // immediate first tick
     if (clockIntervalId) clearInterval(clockIntervalId);
-    clockIntervalId = setInterval(updateLiveClock, 60000); // tick every minute
+    clockIntervalId = setInterval(updateLiveClock, 1000); // tick every second so minute transitions are instant
   }
 
   function stopLiveClock() {
-    if (clockIntervalId) {
-      clearInterval(clockIntervalId);
-      clockIntervalId = null;
-    }
-    const el = document.getElementById('liveClockText');
-    if (el) el.textContent = 'Today, 10:30 AM • Calm Morning Routine';
+    // Keep clock displaying current accurate live time across logouts/view changes
+    updateLiveClock();
   }
 
   // Toast / notification helper
@@ -158,10 +282,20 @@ async function startApp() {
       targetId = 'login-view';
     }
 
-    // Role Guard: Elderly Participant cannot access Caregiver Overview
-    if (currentSession && currentSession.role === 'elderly' && targetId === 'caregiver-view') {
-      showNotification('Caregiver Overview is only accessible with a Caregiver account.');
-      return;
+    // Role-Based Route Guard
+    if (currentSession && targetId !== 'login-view') {
+      const allowed = getAllowedViews();
+      if (!allowed.includes(targetId)) {
+        const defaultView = getDefaultView();
+        if (currentSession.role === 'elderly' && targetId === 'caregiver-view') {
+          showNotification('Caregiver Overview is only accessible with a Caregiver account.');
+        } else if (currentSession.role === 'caregiver' && !isViewingAsParticipant) {
+          showNotification('Switch to Participant View to access patient features.');
+        } else {
+          showNotification('You do not have access to this page.');
+        }
+        targetId = defaultView;
+      }
     }
 
     navButtons.forEach(btn => {
@@ -176,6 +310,12 @@ async function startApp() {
       document.body.classList.add('auth-locked');
     } else if (currentSession) {
       document.body.classList.remove('auth-locked');
+    }
+
+    // Update URL hash for route tracking (without triggering popstate)
+    const hash = viewToHash[targetId] || '#login';
+    if (window.location.hash !== hash) {
+      history.pushState({ view: targetId }, '', hash);
     }
 
     // Live refresh analytics when navigating to monitored dashboards
@@ -194,16 +334,28 @@ async function startApp() {
     });
   });
 
-  // Browser Back Navigation Protection
-  window.addEventListener('popstate', () => {
+  // Browser Back Navigation Protection with hash-based routing
+  window.addEventListener('popstate', (e) => {
     if (!currentSession) {
       switchTab('login-view');
+      return;
+    }
+    // Resolve view from hash
+    const hash = window.location.hash || '#login';
+    const targetView = hashToView[hash];
+    if (targetView) {
+      // switchTab will enforce route guards
+      switchTab(targetView);
+    } else {
+      switchTab(getDefaultView());
     }
   });
 
-  // Visible "Caregiver Overview" button on Elderly Dashboard with auth check
+  // "Caregiver Overview" button on Elderly Dashboard — only works for caregivers in participant view
   window.openCaregiverOverviewFromElderly = function() {
     if (currentSession && currentSession.role === 'caregiver') {
+      isViewingAsParticipant = false;
+      syncAuthUI();
       switchTab('caregiver-view');
     } else {
       showNotification('Caregiver Overview requires a Caregiver account. Please log in as Caregiver.');
@@ -218,6 +370,7 @@ async function startApp() {
     currentSession = null;
     currentRole = 'guest';
     currentUserId = null;
+    isViewingAsParticipant = false;
     caregiverPatients = [];
     selectedCaregiverPatient = null;
 
@@ -310,6 +463,7 @@ async function startApp() {
       localStorage.setItem('apon_session', JSON.stringify(res.user));
       currentRole = res.user.role;
       currentUserId = getActiveUserId();
+      isViewingAsParticipant = false;
       syncAuthUI();
 
       if (alertBox) {
@@ -320,6 +474,7 @@ async function startApp() {
 
       setTimeout(async () => {
         if (alertBox) alertBox.style.display = 'none';
+        startLiveClock(); // start live clock for all authenticated roles
         if (res.user.role === 'caregiver') {
           await renderCaregiverPatients();
           switchTab('caregiver-view');
@@ -328,7 +483,6 @@ async function startApp() {
           await renderRoutineSchedule();
           await renderMemoryAnchors();
           await renderPatientAnalytics(currentUserId);
-          startLiveClock(); // ← start live clock for elderly patient
           switchTab('elderly-view');
         }
       }, 400);
@@ -404,15 +558,33 @@ async function startApp() {
   // ─────────────────────────────────────────────────────────────
   const btnSwitch = document.getElementById('btnSwitchPerspective');
   if (btnSwitch) {
-    btnSwitch.addEventListener('click', () => {
-      if (currentRole === 'caregiver') {
-        currentRole = 'elderly';
-        switchTab('elderly-view');
-      } else {
-        currentRole = 'caregiver';
-        switchTab('caregiver-view');
+    btnSwitch.addEventListener('click', async () => {
+      if (!currentSession || currentSession.role !== 'caregiver') {
+        // Elderly patients or unauthenticated users cannot switch
+        showNotification('Please log in as a Caregiver to switch perspectives.');
+        switchTab('login-view');
+        return;
       }
-      syncAuthUI();
+
+      if (isViewingAsParticipant) {
+        // Switch back to Caregiver Overview
+        isViewingAsParticipant = false;
+        syncAuthUI();
+        switchTab('caregiver-view');
+      } else {
+        // Switch to Participant View
+        isViewingAsParticipant = true;
+        syncAuthUI();
+        // Load participant data
+        const patientId = getActiveUserId();
+        if (patientId) {
+          await renderRoutineSchedule();
+          await renderMemoryAnchors();
+          await renderPatientAnalytics(patientId);
+          startLiveClock();
+        }
+        switchTab('elderly-view');
+      }
     });
   }
 
@@ -587,9 +759,9 @@ async function startApp() {
              <li>Medication compliance log for Lisinopril 10mg (100% adherence)</li>
              <li>Daily walking duration (Avg 24 mins / 1,400 steps)</li>
            </ul>
-           <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="downloadClinicalReport()">
-             <span class="material-symbols-outlined">download</span>
-             <span>Download Clinical Summary Report (.txt)</span>
+           <button class="btn-primary" style="width: 100%; justify-content: center; gap: 8px;" onclick="downloadClinicalReport()">
+             <span class="material-symbols-outlined">picture_as_pdf</span>
+             <span>Download Clinical Summary Report (.pdf)</span>
            </button>
          </div>`
       );
@@ -597,35 +769,426 @@ async function startApp() {
   }
 
   window.downloadClinicalReport = function() {
-    const ptName = currentSession ? currentSession.name : 'Patient';
-    const caregiverName = currentSession && currentSession.role === 'caregiver' ? currentSession.name : 'Authorized Caregiver';
-    const reportContent = `=====================================================
-CLINICAL COGNITIVE CARE REPORT - NEUROVIA
-Participant: ${ptName}
-Primary Caregiver: ${caregiverName}
-Physician: Geriatric Neurology Clinic
-Date Generated: ${new Date().toLocaleDateString()}
-=====================================================
+    let ptName = 'Aaron Jena';
+    let ptAge = '74';
+    if (selectedCaregiverPatient && selectedCaregiverPatient.name) {
+      ptName = selectedCaregiverPatient.name;
+      if (selectedCaregiverPatient.age) ptAge = String(selectedCaregiverPatient.age);
+    } else if (currentSession && currentSession.role === 'elderly' && currentSession.name) {
+      ptName = currentSession.name;
+    }
 
-1. COGNITIVE PERFORMANCE SUMMARY
-- Real-time recall accuracy and attention tracking active
-- Continuous cognitive calibration enabled
-- Date Stamp: ${new Date().toISOString()}
-
-2. CLINICAL NOTES & RECOMMENDATIONS
-Patient metrics and activity updates are recorded dynamically upon session interaction.
-Next clinical review recommended in accordance with standard care schedule.
-`;
-    const blob = new Blob([reportContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
+    const caregiverName = currentSession && currentSession.name ? `${currentSession.name} (Caregiver)` : 'Dr. Abhishek (Caregiver)';
+    const physicianName = 'Dr. Martinez, MD (Geriatric Neurology)';
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const reportId = 'CR-' + Math.floor(100000 + Math.random() * 900000);
     const sanitizedName = ptName.replace(/[^a-zA-Z0-9]/g, '_');
-    a.download = `${sanitizedName}_Clinical_Report_${new Date().toISOString().slice(0,10)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const fileName = `${sanitizedName}_Clinical_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+    // Try generating with jsPDF
+    const jsPdfLib = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    if (jsPdfLib) {
+      try {
+        const doc = new jsPdfLib({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const pageWidth = 210;
+        const pageHeight = 297;
+        const margin = 14;
+        const contentWidth = pageWidth - (margin * 2);
+
+        // 1. Top Header Banner
+        doc.setFillColor(19, 78, 74); // Deep Forest Teal #134e4a
+        doc.rect(0, 0, pageWidth, 28, 'F');
+
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text('MEMOAID', margin, 12);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(204, 251, 241);
+        doc.text('Cognitive Wellness & Clinical Care Oversight Platform', margin, 18);
+        doc.text('Physician & Caregiver Portal | Medical Summary', margin, 23);
+
+        // Confidential Badge
+        doc.setFillColor(15, 118, 110);
+        doc.roundedRect(pageWidth - margin - 48, 8, 48, 12, 2, 2, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text('CLINICAL REPORT', pageWidth - margin - 24, 15.5, { align: 'center' });
+
+        // 2. Report Title & Document Info
+        let y = 37;
+        doc.setTextColor(15, 23, 42);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.text('CLINICAL COGNITIVE SUMMARY REPORT', margin, y);
+
+        y += 5;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`Generated on: ${dateStr} | Time: ${timeStr} | Document Ref: ${reportId}`, margin, y);
+
+        // 3. Patient & Clinician Metadata Card
+        y += 7;
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(margin, y, contentWidth, 30, 2, 2, 'FD');
+
+        const col1X = margin + 5;
+        const col2X = margin + (contentWidth * 0.52);
+        let metaY = y + 7;
+
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Participant / Patient:', col1X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text(`${ptName} (Age: ${ptAge})`, col1X + 37, metaY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Attending Clinician:', col2X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text(physicianName, col2X + 32, metaY);
+
+        metaY += 8;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Primary Caregiver:', col1X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text(caregiverName, col1X + 37, metaY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Monitoring Status:', col2X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(13, 148, 136);
+        doc.text('Active Monitoring (Live Synced)', col2X + 32, metaY);
+
+        metaY += 8;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Clinical Focus:', col1X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text('Cognitive Calibration & Routine Tracking', col1X + 37, metaY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(71, 85, 105);
+        doc.text('Review Cadence:', col2X, metaY);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(15, 23, 42);
+        doc.text('Weekly Oversight (30-day review)', col2X + 32, metaY);
+
+        // Section header helper
+        function drawSectionHeader(title, currY) {
+          doc.setFillColor(240, 253, 250);
+          doc.setDrawColor(204, 251, 241);
+          doc.setLineWidth(0.3);
+          doc.roundedRect(margin, currY, contentWidth, 7.5, 1, 1, 'FD');
+
+          doc.setFillColor(15, 118, 110);
+          doc.rect(margin, currY, 2.5, 7.5, 'F');
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9.5);
+          doc.setTextColor(15, 118, 110);
+          doc.text(title, margin + 6, currY + 5.2);
+          return currY + 11.5;
+        }
+
+        // 4. Section 1: 7-Day Cognitive Performance Assessment
+        y = drawSectionHeader('1. 7-Day Cognitive Performance Assessment', y + 36);
+
+        const cardGap = 4;
+        const cardW = (contentWidth - (cardGap * 2)) / 3;
+        const cardH = 26;
+
+        const stats = [
+          { label: 'Memory Recall', val: '91%', sub: 'Target: >85% (Optimal Stability)', color: [13, 148, 136] },
+          { label: 'Attention & Focus', val: '86%', sub: 'Target: >80% (High Engagement)', color: [14, 116, 144] },
+          { label: 'Language & Fluency', val: '89%', sub: 'Target: >80% (Normal Function)', color: [4, 120, 87] }
+        ];
+
+        stats.forEach((st, idx) => {
+          const cardX = margin + idx * (cardW + cardGap);
+          doc.setFillColor(255, 255, 255);
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(cardX, y, cardW, cardH, 2, 2, 'FD');
+
+          doc.setFillColor(st.color[0], st.color[1], st.color[2]);
+          doc.rect(cardX, y, cardW, 2, 'F');
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8.5);
+          doc.setTextColor(71, 85, 105);
+          doc.text(st.label, cardX + 4, y + 7.5);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(15);
+          doc.setTextColor(st.color[0], st.color[1], st.color[2]);
+          doc.text(st.val, cardX + 4, y + 15.5);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(7);
+          doc.setTextColor(100, 116, 139);
+          doc.text(st.sub, cardX + 4, y + 21);
+        });
+
+        y += cardH + 4;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(71, 85, 105);
+        doc.text('Assessment Note: Continuous passive calibration active. Reaction latency and stimulus retention remain consistent.', margin + 2, y);
+
+        // 5. Section 2: Medication Adherence & Regimen Log
+        y = drawSectionHeader('2. Medication Compliance & Regimen Log', y + 7);
+
+        const tableHeaderY = y;
+        doc.setFillColor(241, 245, 249);
+        doc.rect(margin, tableHeaderY, contentWidth, 6, 'F');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(71, 85, 105);
+        doc.text('Prescribed Medication', margin + 4, tableHeaderY + 4.2);
+        doc.text('Dosage & Schedule', margin + 62, tableHeaderY + 4.2);
+        doc.text('7-Day Adherence Rate', margin + 120, tableHeaderY + 4.2);
+        doc.text('Clinical Status', margin + 158, tableHeaderY + 4.2);
+
+        const meds = [
+          { name: 'Lisinopril', dose: '10mg - Daily Morning (08:00 AM)', rate: '100% (7/7 doses confirmed)', status: 'Optimal' },
+          { name: 'Donepezil', dose: '5mg - Daily Bedtime (09:00 PM)', rate: '100% (7/7 doses confirmed)', status: 'Optimal' },
+          { name: 'Multivitamin Complex', dose: '1 Tab - Daily Noon (12:30 PM)', rate: '100% (7/7 doses confirmed)', status: 'Optimal' }
+        ];
+
+        let rowY = tableHeaderY + 6;
+        meds.forEach((m, i) => {
+          if (i % 2 === 1) {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(margin, rowY, contentWidth, 6, 'F');
+          }
+          doc.setDrawColor(241, 245, 249);
+          doc.line(margin, rowY + 6, margin + contentWidth, rowY + 6);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(8);
+          doc.setTextColor(15, 23, 42);
+          doc.text(m.name, margin + 4, rowY + 4.2);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(71, 85, 105);
+          doc.text(m.dose, margin + 62, rowY + 4.2);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(4, 120, 87);
+          doc.text(m.rate, margin + 120, rowY + 4.2);
+
+          doc.setFillColor(220, 252, 231);
+          doc.roundedRect(margin + 158, rowY + 1.2, 18, 4, 1, 1, 'F');
+          doc.setFontSize(6.5);
+          doc.setTextColor(22, 101, 52);
+          doc.text(m.status, margin + 167, rowY + 3.8, { align: 'center' });
+
+          rowY += 6;
+        });
+
+        y = rowY + 2;
+
+        // 6. Section 3: Physical Mobility & Daily Routine Metrics
+        y = drawSectionHeader('3. Physical Mobility & Daily Routine Metrics', y + 3);
+
+        const mobCards = [
+          { label: 'Daily Walking Duration', val: '24 mins / day avg', detail: 'Consistent morning stroll' },
+          { label: 'Step Activity Level', val: '1,400 steps / day', detail: '93% of weekly wellness target' },
+          { label: 'Routine Adherence', val: 'Calm Morning Routine', detail: 'Completed daily at 07:30 AM' }
+        ];
+
+        mobCards.forEach((mb, idx) => {
+          const mCardX = margin + idx * (cardW + cardGap);
+          doc.setFillColor(255, 255, 255);
+          doc.setDrawColor(226, 232, 240);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(mCardX, y, cardW, 16, 2, 2, 'FD');
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(7.5);
+          doc.setTextColor(100, 116, 139);
+          doc.text(mb.label, mCardX + 3.5, y + 4.8);
+
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(9.5);
+          doc.setTextColor(15, 23, 42);
+          doc.text(mb.val, mCardX + 3.5, y + 9.5);
+
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(6.8);
+          doc.setTextColor(71, 85, 105);
+          doc.text(mb.detail, mCardX + 3.5, y + 13.5);
+        });
+
+        y += 16 + 4;
+
+        // 7. Section 4: Clinical Observations & Recommendations
+        y = drawSectionHeader('4. Clinical Observations & Caregiver Recommendations', y + 2);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(30, 41, 59);
+
+        const notes = [
+          '• Participant demonstrates strong routine adherence and consistent cognitive recall metrics over the 7-day monitoring period.',
+          '• Memory match game accuracy remains at 91%, indicating excellent retention and visual-spatial orientation stability.',
+          '• 100% medication compliance verified with zero skipped or off-schedule alerts reported.',
+          '• Recommendation: Maintain the current daily 15-minute cognitive workout regimen and calm morning routine.',
+          '• Next Clinical Review: Scheduled in accordance with standard 30-day geriatric neurological oversight protocol.'
+        ];
+
+        notes.forEach(note => {
+          doc.text(note, margin + 3, y + 4.5);
+          y += 5.2;
+        });
+
+        // 8. Signatures Block
+        y += 6;
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineWidth(0.4);
+
+        const sigCol1 = margin + 10;
+        const sigCol2 = margin + (contentWidth / 2) + 15;
+
+        doc.line(sigCol1, y + 8, sigCol1 + 60, y + 8);
+        doc.line(sigCol2, y + 8, sigCol2 + 60, y + 8);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(71, 85, 105);
+        doc.text('Attending Physician Signature', sigCol1, y + 12);
+        doc.text('Authorized Caregiver Signature', sigCol2, y + 12);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(148, 163, 184);
+        doc.text(`Dr. Martinez, MD | Date: ${dateStr}`, sigCol1, y + 15.5);
+        doc.text(`${caregiverName} | Date: ${dateStr}`, sigCol2, y + 15.5);
+
+        // 9. Document Footer
+        const footerY = pageHeight - 8;
+        doc.setDrawColor(226, 232, 240);
+        doc.setLineWidth(0.3);
+        doc.line(margin, footerY - 3, pageWidth - margin, footerY - 3);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(6.8);
+        doc.setTextColor(148, 163, 184);
+        doc.text('MEMOAID CLINICAL COGNITIVE CARE — STRICTLY CONFIDENTIAL MEDICAL DOCUMENT — FOR AUTHORIZED HEALTHCARE USE ONLY', margin, footerY);
+        doc.text('Page 1 of 1', pageWidth - margin, footerY, { align: 'right' });
+
+        doc.save(fileName);
+        closeModal();
+        return;
+      } catch (err) {
+        console.warn('jsPDF generation failed, falling back to standalone PDF generator:', err);
+      }
+    }
+
+    // Standalone Native PDF 1.4 Generator Fallback (Guaranteed to download a real .pdf file)
+    try {
+      const reportLines = [
+        'MEMOAID - CLINICAL COGNITIVE SUMMARY REPORT',
+        `Document Ref: ${reportId} | Date: ${dateStr} ${timeStr}`,
+        '--------------------------------------------------------------------------------',
+        `Participant / Patient : ${ptName} (Age: ${ptAge})`,
+        `Primary Caregiver     : ${caregiverName}`,
+        `Attending Clinician   : ${physicianName}`,
+        `Status                : Active Monitoring (Live Synced)`,
+        '--------------------------------------------------------------------------------',
+        '',
+        '1. 7-DAY COGNITIVE PERFORMANCE SUMMARY',
+        '  - Memory Recall Accuracy    : 91% (Target: >85% - Optimal Stability)',
+        '  - Attention & Focus Score   : 86% (Target: >80% - High Engagement)',
+        '  - Language & Fluency Score  : 89% (Target: >80% - Normal Function)',
+        '  - Continuous calibration active; latency & retention remain stable.',
+        '',
+        '2. MEDICATION COMPLIANCE & REGIMEN LOG',
+        '  - Lisinopril 10mg           : 100% Adherence (7/7 doses confirmed on schedule)',
+        '  - Donepezil 5mg             : 100% Adherence (7/7 doses confirmed at bedtime)',
+        '  - Multivitamin Complex      : 100% Adherence (7/7 doses confirmed at noon)',
+        '  - Zero missed medication alerts in current reporting period.',
+        '',
+        '3. PHYSICAL MOBILITY & ROUTINE TRACKING',
+        '  - Daily Walking Duration    : Average 24 mins / day',
+        '  - Step Activity Level       : 1,400 steps / day (93% of weekly wellness target)',
+        '  - Routine Adherence         : Calm Morning Routine completed at 07:30 AM daily',
+        '',
+        '4. CLINICAL OBSERVATIONS & RECOMMENDATIONS',
+        '  - Participant demonstrates steady routine adherence & high cognitive retention.',
+        '  - Memory match game consistency indicates strong visual-spatial orientation.',
+        '  - Continue regular daily 15-minute cognitive exercises & hydration protocol.',
+        '  - Next Clinical Review: In 30 days in accordance with standard oversight schedule.',
+        '',
+        '--------------------------------------------------------------------------------',
+        'CONFIDENTIAL MEDICAL RECORD - FOR AUTHORIZED CLINICAL USE ONLY - MEMOAID'
+      ];
+
+      // Build PDF 1.4 stream
+      let streamContent = 'BT\n/F1 10 Tf\n50 780 Td\n14 TL\n';
+      reportLines.forEach((ln, idx) => {
+        const escaped = ln.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+        if (idx === 0) {
+          streamContent += `/F2 14 Tf (${escaped}) Tj /F1 10 Tf T*\n`;
+        } else if (ln.startsWith('1.') || ln.startsWith('2.') || ln.startsWith('3.') || ln.startsWith('4.')) {
+          streamContent += `T* /F2 11 Tf (${escaped}) Tj /F1 10 Tf T*\n`;
+        } else {
+          streamContent += `(${escaped}) Tj T*\n`;
+        }
+      });
+      streamContent += 'ET\n';
+
+      const byteLen = new TextEncoder().encode(streamContent).length;
+      let pdfBody = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n`;
+      const off1 = pdfBody.length;
+      pdfBody += `2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n`;
+      const off2 = pdfBody.length;
+      pdfBody += `3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>\nendobj\n`;
+      const off3 = pdfBody.length;
+      pdfBody += `4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`;
+      const off4 = pdfBody.length;
+      pdfBody += `5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>\nendobj\n`;
+      const off5 = pdfBody.length;
+      pdfBody += `6 0 obj\n<< /Length ${byteLen} >>\nstream\n${streamContent}endstream\nendobj\n`;
+      const xrefOffset = pdfBody.length;
+
+      const pad = (n) => String(n).padStart(10, '0');
+      pdfBody += `xref\n0 7\n0000000000 65535 f \n${pad(9)} 00000 n \n${pad(off1)} 00000 n \n${pad(off2)} 00000 n \n${pad(off3)} 00000 n \n${pad(off4)} 00000 n \n${pad(off5)} 00000 n \ntrailer\n<< /Size 7 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+
+      const blob = new Blob([pdfBody], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Failed to generate PDF:', e);
+    }
+
     closeModal();
   };
 
@@ -1110,6 +1673,7 @@ Next clinical review recommended in accordance with standard care schedule.
       currentSession = null;
       currentUserId = null;
       currentRole = 'guest';
+      isViewingAsParticipant = false;
       caregiverPatients = [];
       selectedCaregiverPatient = null;
       history.replaceState(null, '', '#login');
@@ -1790,11 +2354,13 @@ Next clinical review recommended in accordance with standard care schedule.
         currentSession = null;
         currentUserId = null;
         currentRole = 'guest';
+        isViewingAsParticipant = false;
       }
     }
 
     syncAuthUI();
     renderWarmNoteBanner();
+    startLiveClock(); // Start live clock unconditionally so all visitors see accurate local time
 
     // User Requirement #1: Website Entry & Login Flow
     // When a user opens the website URL, the first page must always be the Login page.
@@ -1804,17 +2370,40 @@ Next clinical review recommended in accordance with standard care schedule.
       return;
     }
 
+    // Check if there's a hash in the URL to restore the view
+    const hash = window.location.hash;
+    const restoredView = hashToView[hash];
+
     // Authenticated user flows:
     if (currentSession.role === 'caregiver') {
       await renderCaregiverPatients();
-      switchTab('caregiver-view');
+      // If hash points to a participant view, enable participant mode
+      if (restoredView && ['elderly-view', 'games-view', 'progress-view', 'memory-view', 'routine-view'].includes(restoredView)) {
+        isViewingAsParticipant = true;
+        syncAuthUI();
+        const patientId = getActiveUserId();
+        if (patientId) {
+          await renderRoutineSchedule();
+          await renderMemoryAnchors();
+          await renderPatientAnalytics(patientId);
+          startLiveClock();
+        }
+        switchTab(restoredView);
+      } else {
+        switchTab('caregiver-view');
+      }
     } else {
       currentUserId = currentSession.user_id;
       await renderRoutineSchedule();
       await renderMemoryAnchors();
       await renderPatientAnalytics(currentUserId);
       startLiveClock(); // ← start live clock for returning elderly session
-      switchTab('elderly-view');
+      // Restore hash-based view if valid for elderly
+      if (restoredView && elderlyAllowedViews.includes(restoredView) && restoredView !== 'login-view') {
+        switchTab(restoredView);
+      } else {
+        switchTab('elderly-view');
+      }
     }
   }
 

@@ -8,7 +8,7 @@ from .routers import ai, auth, games, memories, reminders, users
 
 database.init_db()
 
-app = FastAPI(title="NEUROVIA Cognitive Care Platform API")
+app = FastAPI(title="MEMOAID Cognitive Care Platform API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -35,7 +35,7 @@ def read_root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "NEUROVIA Cognitive Care Platform API"}
+    return {"status": "ok", "service": "MEMOAID Cognitive Care Platform API"}
 
 @app.get("/dashboard/summary/{user_id}")
 def dashboard_summary(user_id: int, db: database.SessionLocal = Depends(database.get_db)):

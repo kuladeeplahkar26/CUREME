@@ -11,7 +11,7 @@ from components.nav import render_nav
 from utils import styles
 from utils.data_service import get_activities_catalog, initialize_session_state
 
-st.set_page_config(page_title="Cognitive Activities - NEUROVIA", layout="wide")
+st.set_page_config(page_title="Cognitive Activities - MEMOAID", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()

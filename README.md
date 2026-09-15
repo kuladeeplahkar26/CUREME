@@ -1,4 +1,4 @@
-# NEUROVIA - Cognitive Wellness Platform (CUREME)
+# MEMOAID - Cognitive Wellness Platform
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kuladeeplahkar26/CUREME)
 

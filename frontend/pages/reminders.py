@@ -12,7 +12,7 @@ from utils import styles
 from utils.api_client import api
 from utils.data_service import initialize_session_state
 
-st.set_page_config(page_title="Daily Routine - NEUROVIA", layout="wide")
+st.set_page_config(page_title="Daily Routine - MEMOAID", layout="wide")
 initialize_session_state()
 styles.apply_styles()
 render_nav()
