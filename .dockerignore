@@ -4,3 +4,14 @@ __pycache__
 .vscode
 .gemini
 *.zip
+*.exe
+.pytest_cache
+.ruff_cache
+.mypy_cache
+*.log
+.env
+.env.*
+stitch_design/
+stitch_apon_ui_ux_modernization.zip
+cloudflared.exe
+*.db
